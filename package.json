@@ -5,7 +5,8 @@
   "scripts": {
     "db:new": "wrangler d1 create northwind",
     "db:init": "wrangler d1 execute northwind --file=./db/schema.sql",
-    "db:load": "wrangler d1 execute northwind --file=./db/data-big.sql"
+    "db:load": "wrangler d1 execute northwind --file=./db/data-big.sql",
+    "stress": "node --experimental-strip-types stress.mts"
   },
   "workspaces": [
     "worker",

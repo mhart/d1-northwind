@@ -1,21 +1,23 @@
+
 main = "index.ts"
-name = "northwind-worker"
+name = "northwind-worker-stress"
 compatibility_flags = ["nodejs_compat"]
 compatibility_date = "2024-09-23"
+account_id = "d6850012d250c1600028b55d1d879b16"
+workers_dev = false
+preview_urls = false
 
-[observability]
-enabled = true
+[[routes]]
+pattern = "api2.cf-northwind.com"
+custom_domain = true
 
 [dev]
 port = 8789
 
-[placement]
-mode = "smart"
-
 [[d1_databases]]
 binding = "DB"
 database_name = "northwind"
-database_id = "a6d16b6d-d6fa-4ced-9c06-6c4f7337a17c"
+database_id = "d2757109-c1bf-4a66-b325-4d9c09b3e3a7"
 
 # [[d1_databases]]
 # binding = "DB-Read-Replication"
@@ -24,4 +26,4 @@ database_id = "a6d16b6d-d6fa-4ced-9c06-6c4f7337a17c"
 
 [[kv_namespaces]]
 binding = "PRODUCT_SEARCH_CACHE"
-id = "4c21f260ce854d93bd7ff43846763c34"
+id = "fb5a73689cfa48f7a901706440c193af"

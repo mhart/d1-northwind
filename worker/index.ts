@@ -23,12 +23,12 @@ apiEndpoints.push(apiEmployees());
 apiEndpoints.push(apiCustomer());
 apiEndpoints.push(apiCustomers());
 apiEndpoints.push(apiSearch());
-apiEndpoints.push(apiPaymentWebhook())
+apiEndpoints.push(apiPaymentWebhook());
 
 export default {
-  async fetch(request: Request, env: Env) {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     try {
-      return handleRequest(request, env);
+      return handleRequest(request, env, ctx);
     } catch (e) {
       return new Response(`${e}`);
     }
@@ -47,7 +47,11 @@ async function jsonReply(json: object, status = 200) {
   });
 }
 
-async function handleRequest(request: Request, env: Env) {
+async function handleRequest(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext
+) {
   let url = new URL(request.url);
   let [path, param] = url.pathname.slice(1).split("/");
 
@@ -58,6 +62,6 @@ async function handleRequest(request: Request, env: Env) {
     .map((ep) => `${ep.method},${ep.path}`)
     .indexOf(`${request.method},${param}`);
 
-  const apiResult = await apiEndpoints[api].handler(request, env);
+  const apiResult = await apiEndpoints[api].handler(request, env, ctx);
   return jsonReply(apiResult, apiResult.error ? apiResult.error : 200);
 }

@@ -1,33 +1,40 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "northwind-queue-worker",
+	"$schema": "../node_modules/wrangler/config-schema.json",
+	"name": "northwind-queue-worker-stress",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-01-24",
-	"observability": {
-		"enabled": true
-	},
-	"placement": { "mode": "smart" },
+	"account_id": "d6850012d250c1600028b55d1d879b16",
+	"workers_dev": false,
+	"preview_urls": false,
+
+	"routes": [
+		{
+			"pattern": "queue2.cf-northwind.com",
+			"custom_domain": true
+		}
+	],
+
 	"d1_databases": [
 		{
 			"binding": "DB",
 			"database_name": "northwind",
-			"database_id": "a6d16b6d-d6fa-4ced-9c06-6c4f7337a17c"
+			"database_id": "d2757109-c1bf-4a66-b325-4d9c09b3e3a7"
 		}
 	],
 	"queues": {
 		"producers": [
 			{
-				"queue": "northwind-inventory-queue",
+				"queue": "northwind-inventory-queue-stress",
 				"binding": "northwind_inventory_queue"
 			}
 		],
 		"consumers": [
 			{
-				"queue": "northwind-inventory-queue",
-				"max_batch_timeout": 3,
-				"max_batch_size": 10,
+				"queue": "northwind-inventory-queue-stress",
+				"max_batch_timeout": 1,
+				"max_batch_size": 100,
 				"max_retries": 3,
-				"dead_letter_queue": "northwind-dead-letter"
+				"dead_letter_queue": "northwind-dead-letter-stress"
 			}
 		]
 	}

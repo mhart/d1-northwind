@@ -1,16 +1,3 @@
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8789/ to see your worker in action
- * - Run `npm run deploy` to publish your worker
- *
- * Bind resources to your worker in `wrangler.json`. After adding bindings, a type definition for the
- * `Env` object can be regenerated with `npm run cf-typegen`.
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
-
 export interface Env {
 	northwind_inventory_queue: Queue<any>;
 	DB: D1Database;
@@ -24,28 +11,42 @@ export default {
 				headers: corsHeaders,
 			});
 		}
+		const { pathname } = new URL(request.url);
+		if (pathname !== '/') {
+			return Response.json('Not found', { status: 404, headers: { ...corsHeaders } });
+		}
 
-		const body = (await request.json()) as { updateInventoryBy: number; productId: number };
-		let productUpdate = {
-			updateInventoryBy: body.updateInventoryBy,
-			productId: body.productId,
-		};
+		try {
+			let body = (await request.json()) as
+				| { updateInventoryBy: number; productId: number }
+				| { updateInventoryBy: number; productId: number }[];
+			if (!Array.isArray(body)) {
+				body = [body];
+			}
+			let productUpdates = body.map((update) => {
+				return {
+					body: {
+						updateInventoryBy: update.updateInventoryBy,
+						productId: update.productId,
+					},
+				};
+			});
 
-		await env.northwind_inventory_queue.send(productUpdate);
-		return Response.json('Success', { headers: { ...corsHeaders } });
+			await env.northwind_inventory_queue.sendBatch(productUpdates);
+			return Response.json('Success', { headers: { ...corsHeaders } });
+		} catch (e) {
+			return Response.json('Error', { status: 500, headers: { ...corsHeaders } });
+		}
 	},
 
 	async queue(batch, env): Promise<void> {
-		// Simulate an error during the batch update process for 15% of the calls
-		if (Math.random() < 0.15) {
-			throw new Error('Simulated error during batch update for testing queue retry logic');
-		}
+		const start = Date.now();
 
 		const updates = batch.messages.reduce((acc, message) => {
 			const body = message.body as { updateInventoryBy: number; productId: number };
 			const { updateInventoryBy, productId } = body;
 			const retryCount = message.attempts;
-			console.log(`Processing product ID: ${productId}, update inventory by ${updateInventoryBy}. Attempt count: ${retryCount}`);
+			// console.log(`Processing product ID: ${productId}, update inventory by ${updateInventoryBy}. Attempt count: ${retryCount}`);
 			if (!acc[productId]) {
 				acc[productId] = 0;
 			}
@@ -53,14 +54,15 @@ export default {
 			return acc;
 		}, {} as Record<number, number>);
 
-		console.log(`Batch size: ${batch.messages.length}, Updates size: ${Object.keys(updates).length}`);
+		const stmt = env.DB.prepare(`UPDATE Product SET UnitsInStock = max(UnitsInStock + ?, 0) WHERE Id = ?`);
 
-		// Create statements for aggregated updates
-		const statements = Object.entries(updates).map(([productId, totalUpdate]) => {
-			return env.DB.prepare(`UPDATE Product SET UnitsInStock = UnitsInStock + ? WHERE Id = ?`).bind(totalUpdate, productId);
-		});
+		const statements = Object.entries(updates).map(([productId, totalUpdate]) => stmt.bind(totalUpdate, productId));
 
 		await env.DB.batch(statements);
+
+		const end = Date.now();
+
+		console.log(`Batch size: ${batch.messages.length}, Updates size: ${Object.keys(updates).length}, Time taken: ${end - start}ms`);
 	},
 } satisfies ExportedHandler<Env>;
 
