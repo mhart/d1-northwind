@@ -28,7 +28,7 @@ export const loader: LoaderFunction = async ({
   const startTime = Date.now();
   const res = await fetch(path, {
     headers: {
-      "Role": role,
+      Role: role,
     },
   });
   const endTime = Date.now();
@@ -147,7 +147,9 @@ const OrdersNoValidation = () => {
         </div>
       )}
       <div className="text-xl font-semibold my-3">Total orders: {total}</div>
-      <div className="text-xl font-semibold my-3">Total data fetch time: {fetchTime} ms</div>
+      <div className="text-xl font-semibold my-3">
+        Total data fetch time: {fetchTime} ms
+      </div>
       {orders.length ? (
         <div className="card has-table">
           <header className="card-header">

@@ -25,3 +25,23 @@ CREATE TABLE IF NOT EXISTS "Region" ( "Id" INTEGER PRIMARY KEY, "RegionDescripti
 CREATE TABLE IF NOT EXISTS "Territory" ( "Id" VARCHAR(8000) PRIMARY KEY, "TerritoryDescription" VARCHAR(8000) NULL, "RegionId" INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS "EmployeeTerritory" ( "Id" VARCHAR(8000) PRIMARY KEY, "EmployeeId" INTEGER NOT NULL, "TerritoryId" VARCHAR(8000) NULL);
 CREATE VIEW [ProductDetails_V] as select p.*, c.CategoryName, c.Description as [CategoryDescription], s.CompanyName as [SupplierName], s.Region as [SupplierRegion] from [Product] p join [Category] c on p.CategoryId = c.id join [Supplier] s on s.id = p.SupplierId;
+CREATE TABLE IF NOT EXISTS "Employee" (
+    "Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "LastName" TEXT,
+    "FirstName" TEXT,
+    "Title" TEXT,
+    "TitleOfCourtesy" TEXT,
+    "BirthDate" TEXT,
+    "HireDate" TEXT,
+    "Address" TEXT,
+    "City" TEXT,
+    "Region" TEXT,
+    "PostalCode" TEXT,
+    "Country" TEXT,
+    "HomePhone" TEXT,
+    "Extension" TEXT,
+    "Photo" BLOB,
+    "Notes" TEXT,
+    "ReportsTo" INTEGER,
+    "PhotoPath" TEXT
+);

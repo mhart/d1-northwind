@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "Employee" (
+CREATE TABLE IF NOT EXISTS "Employee" (
     "Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "LastName" TEXT,
     "FirstName" TEXT,

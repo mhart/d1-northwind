@@ -28,9 +28,9 @@ export default function Admin() {
     for (let i = 0; i < 250; i++) {
       const item = data[i % data.length];
       await fetch(path, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(item),
       });
@@ -49,9 +49,7 @@ export default function Admin() {
         >
           Trigger Inventory Updates
         </button>
-        {loading && (
-          <Loader className="animate-spin ml-4" />
-        )}
+        {loading && <Loader className="animate-spin ml-4" />}
       </div>
     </div>
   );
